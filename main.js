@@ -9,8 +9,14 @@ const canvas = document.getElementById("myCanvas");
 canvas.width = 200;
 
 const ctx = canvas.getContext("2d");
+
+const road = new Road({
+  x: canvas.width / 2,
+  width: canvas.width * 0.9,
+});
+
 const car = new Car({
-  x: 100,
+  x: road.getLaneCenter(1),
   y: 100,
   width: 30,
   height: 50,
@@ -21,7 +27,18 @@ animate();
 function animate() {
   canvas.height = window.innerHeight;
 
+  ctx.save();
+
+  const cartStartingPosition = -car.y + canvas.height * 0.7;
+  // This is what makes the road move under the car instead of the car over the road
+  ctx.translate(0, cartStartingPosition);
+
+  road.draw(ctx);
+
   car.update();
   car.draw(ctx);
+
+  ctx.restore();
+
   requestAnimationFrame(animate);
 }
