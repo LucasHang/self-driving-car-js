@@ -1,6 +1,6 @@
 class Controls {
   /**
-   * @param {'keys' | 'dummy'} type
+   * @param {'keys' | 'dummy' | 'ai'} type
    */
   constructor(type) {
     this.forward = false;
