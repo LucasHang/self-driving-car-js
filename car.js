@@ -1,3 +1,5 @@
+const DEFAULT_ANGLE_INCREASE = 0.015;
+
 class Car {
   /**
    * @param {{
@@ -5,6 +7,8 @@ class Car {
    *  y: number;
    *  width: number;
    *  height: number;
+   *  controlType: 'keys' | 'dummy';
+   *  maxSpeed?: number;
    * }} params
    */
   constructor(params) {
@@ -14,35 +18,47 @@ class Car {
     this.height = params.height;
 
     this.speed = 0;
-    this.acceleration = 0.2;
-    this.maxSpeed = 3;
+    this.acceleration = 0.15;
+    this.maxSpeed = params.maxSpeed || 3;
     this.friction = 0.05;
     this.angle = 0;
     this.damaged = false;
 
-    this.sensor = new Sensor(this);
-    this.controls = new Controls();
+    if (params.controlType !== "dummy") {
+      this.sensor = new Sensor(this);
+    }
+    this.controls = new Controls(params.controlType);
   }
 
   /**
    * @param {[{ x: number, y:number }, { x: number, y:number }][]} roadBorders
+   * @param {any[]} traffic Array of Cars actually
    */
-  update(roadBorders) {
+  update(roadBorders, traffic) {
     if (!this.damaged) {
       this.#move();
       this.polygon = this.#createPolygon();
-      this.damaged = this.#assessDamage(roadBorders);
+      this.damaged = this.#assessDamage(roadBorders, traffic);
     }
 
-    this.sensor.update(roadBorders);
+    if (this.sensor) {
+      this.sensor.update(roadBorders, traffic);
+    }
   }
 
   /**
    * @param {[{ x: number, y:number }, { x: number, y:number }][]} roadBorders
+   * @param {any[]} traffic Array of Cars actually
    */
-  #assessDamage(roadBorders) {
+  #assessDamage(roadBorders, traffic) {
     for (let i = 0; i < roadBorders.length; i++) {
       if (polysIntersect(this.polygon, roadBorders[i])) {
+        return true;
+      }
+    }
+
+    for (let i = 0; i < traffic.length; i++) {
+      if (polysIntersect(this.polygon, traffic[i].polygon)) {
         return true;
       }
     }
@@ -124,11 +140,11 @@ class Car {
       const flip = this.speed > 0 ? 1 : -1;
 
       if (this.controls.left) {
-        this.angle += 0.03 * flip;
+        this.angle += DEFAULT_ANGLE_INCREASE * flip;
       }
 
       if (this.controls.right) {
-        this.angle -= 0.03 * flip;
+        this.angle -= DEFAULT_ANGLE_INCREASE * flip;
       }
     }
 
@@ -146,9 +162,10 @@ class Car {
 
   /**
    * @param {any} ctx A canvas 2d context
+   * @param {string | undefined} color The undameged color of the car
    */
-  draw(ctx) {
-    ctx.fillStyle = this.damaged ? "gray" : "black";
+  draw(ctx, color = "black") {
+    ctx.fillStyle = this.damaged ? "gray" : color;
 
     ctx.beginPath();
 
@@ -162,6 +179,8 @@ class Car {
 
     ctx.fill();
 
-    this.sensor.draw(ctx);
+    if (this.sensor) {
+      this.sensor.draw(ctx);
+    }
   }
 }

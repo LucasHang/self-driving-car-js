@@ -20,7 +20,19 @@ const car = new Car({
   y: 100,
   width: 30,
   height: 50,
+  controlType: "keys",
 });
+
+const traffic = [
+  new Car({
+    x: road.getLaneCenter(1),
+    y: -100,
+    width: 30,
+    height: 50,
+    controlType: "dummy",
+    maxSpeed: 2,
+  }),
+];
 
 animate();
 
@@ -35,8 +47,14 @@ function animate() {
 
   road.draw(ctx);
 
-  car.update(road.borders);
-  car.draw(ctx);
+  for (let i = 0; i < traffic.length; i++) {
+    const trafficCar = traffic[i];
+    trafficCar.update(road.borders, []);
+    trafficCar.draw(ctx, "red");
+  }
+
+  car.update(road.borders, traffic);
+  car.draw(ctx, "blue");
 
   ctx.restore();
 
