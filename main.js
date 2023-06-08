@@ -35,7 +35,7 @@ function animate() {
 
   road.draw(ctx);
 
-  car.update();
+  car.update(road.borders);
   car.draw(ctx);
 
   ctx.restore();
