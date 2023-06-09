@@ -5,14 +5,19 @@
  * - The Y dimension INCREASES to the bottom and DECREASES to the top (inverse of a cartesian plane)
  */
 
-const canvas = document.getElementById("myCanvas");
-canvas.width = 200;
+const carCanvas = document.getElementById("carCanvas");
+carCanvas.width = 200;
 
-const ctx = canvas.getContext("2d");
+const networkCanvas = document.getElementById("networkCanvas");
+networkCanvas.width = 400;
+
+const carCtx = carCanvas.getContext("2d");
+
+const networkCtx = networkCanvas.getContext("2d");
 
 const road = new Road({
-  x: canvas.width / 2,
-  width: canvas.width * 0.9,
+  x: carCanvas.width / 2,
+  width: carCanvas.width * 0.9,
 });
 
 const car = new Car({
@@ -36,27 +41,34 @@ const traffic = [
 
 animate();
 
-function animate() {
-  canvas.height = window.innerHeight;
+/**
+ * @param {number | undefined} time Passed by `requestAnimationFrame`
+ */
+function animate(time) {
+  carCanvas.height = window.innerHeight;
+  networkCanvas.height = window.innerHeight;
 
-  ctx.save();
+  carCtx.save();
 
-  const cartStartingPosition = -car.y + canvas.height * 0.7;
+  const cartStartingPosition = -car.y + carCanvas.height * 0.7;
   // This is what makes the road move under the car instead of the car over the road
-  ctx.translate(0, cartStartingPosition);
+  carCtx.translate(0, cartStartingPosition);
 
-  road.draw(ctx);
+  road.draw(carCtx);
 
   for (let i = 0; i < traffic.length; i++) {
     const trafficCar = traffic[i];
     trafficCar.update(road.borders, []);
-    trafficCar.draw(ctx, "red");
+    trafficCar.draw(carCtx, "red");
   }
 
   car.update(road.borders, traffic);
-  car.draw(ctx, "blue");
+  car.draw(carCtx, "blue");
 
-  ctx.restore();
+  carCtx.restore();
+
+  networkCtx.lineDashOffset = -time / 50;
+  Visualizer.drawNetwork(networkCtx, car.brain);
 
   requestAnimationFrame(animate);
 }

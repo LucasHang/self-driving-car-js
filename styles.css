@@ -23,8 +23,12 @@ a {
   color: black;
 }
 
-#myCanvas {
+#carCanvas {
   background: lightgrey;
+}
+
+#networkCanvas {
+  background: black;
 }
 
 header {

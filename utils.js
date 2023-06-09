@@ -82,3 +82,16 @@ function polysIntersect(poly1, poly2) {
 
   return false;
 }
+
+/**
+ * @param {number} value Between -1 and 1
+ */
+function getRGBA(value) {
+  const alpha = Math.abs(value);
+  // Making so that we have yellow for connections with positive value and blue for negative values
+  const R = value < 0 ? 0 : 255;
+  const G = R;
+  const B = value > 0 ? 0 : 255;
+
+  return `rgba(${R}, ${G}, ${B}, ${alpha})`;
+}
