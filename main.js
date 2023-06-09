@@ -20,7 +20,7 @@ const road = new Road({
   width: carCanvas.width * 0.9,
 });
 
-const N = 1000;
+const N = 300;
 const cars = generateCars(N);
 
 let bestCar = cars[0];
@@ -30,93 +30,112 @@ if (localStorage.getItem("bestBrain")) {
     cars[i].brain = JSON.parse(localStorage.getItem("bestBrain"));
 
     if (i != 0) {
-      NeuralNetwork.mutate(cars[i].brain, 0.12);
+      NeuralNetwork.mutate(cars[i].brain, 0.15);
     }
   }
 }
 
-const traffic = [
-  new Car({
-    x: road.getLaneCenter(1),
-    y: -100,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(0),
-    y: -300,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(2),
-    y: -300,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(0),
-    y: -500,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(1),
-    y: -500,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(1),
-    y: -750,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(2),
-    y: -700,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(1),
-    y: -900,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(0),
-    y: -1100,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-  new Car({
-    x: road.getLaneCenter(2),
-    y: -1100,
-    width: 30,
-    height: 50,
-    controlType: "dummy",
-    maxSpeed: 2,
-  }),
-];
+const traffic = generateTraffic();
+
+function generateTraffic() {
+  const width = 30;
+  const height = 50;
+  const controlType = "dummy";
+  const maxSpeed = 2;
+
+  return [
+    new Car({
+      x: road.getLaneCenter(1),
+      y: -100,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(0),
+      y: -300,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(2),
+      y: -300,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(0),
+      y: -500,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(1),
+      y: -500,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(1),
+      y: -750,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(2),
+      y: -700,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(1),
+      y: -900,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(0),
+      y: -1100,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+    new Car({
+      x: road.getLaneCenter(2),
+      y: -1100,
+      width,
+      height,
+      controlType,
+      maxSpeed,
+      color: getRandomColor(),
+    }),
+  ];
+}
 
 function generateCars(N) {
   const cars = [];
@@ -163,10 +182,10 @@ function animate(time) {
   carCtx.globalAlpha = 0.2;
   cars.forEach((car) => {
     car.update(road.borders, traffic);
-    car.draw(carCtx, "blue");
+    car.draw(carCtx);
   });
   carCtx.globalAlpha = 1;
-  bestCar.draw(carCtx, "blue", true);
+  bestCar.draw(carCtx, true);
 
   carCtx.restore();
 

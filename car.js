@@ -9,6 +9,7 @@ class Car {
    *  height: number;
    *  controlType: 'keys' | 'dummy' | 'ai';
    *  maxSpeed?: number;
+   *  color?: string;
    * }} params
    */
   constructor(params) {
@@ -32,6 +33,23 @@ class Car {
     }
 
     this.controls = new Controls(params.controlType);
+
+    this.img = new Image();
+    this.img.src = "car.png";
+
+    this.mask = document.createElement("canvas");
+    this.mask.width = params.width;
+    this.mask.height = params.height;
+
+    const maskCtx = this.mask.getContext("2d");
+    this.img.onload = () => {
+      maskCtx.fillStyle = params.color || "blue";
+      maskCtx.rect(0, 0, this.width, this.height);
+      maskCtx.fill();
+
+      maskCtx.globalCompositeOperation = "destination-atop";
+      maskCtx.drawImage(this.img, 0, 0, this.width, this.height);
+    };
   }
 
   /**
@@ -182,23 +200,31 @@ class Car {
    * @param {string | undefined} color The undameged color of the car
    * @param {boolean | undefined} drawSensor Default `false`
    */
-  draw(ctx, color = "black", drawSensor = false) {
-    ctx.fillStyle = this.damaged ? "gray" : color;
-
-    ctx.beginPath();
-
-    const firstPolygonPoint = this.polygon[0];
-    ctx.moveTo(firstPolygonPoint.x, firstPolygonPoint.y);
-
-    for (let i = 1; i < this.polygon.length; i++) {
-      const polygonPoint = this.polygon[i];
-      ctx.lineTo(polygonPoint.x, polygonPoint.y);
-    }
-
-    ctx.fill();
-
+  draw(ctx, drawSensor = false) {
     if (this.sensor && drawSensor) {
       this.sensor.draw(ctx);
     }
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(-this.angle);
+    if (!this.damaged) {
+      ctx.drawImage(
+        this.mask,
+        -this.width / 2,
+        -this.height / 2,
+        this.width,
+        this.height
+      );
+      ctx.globalCompositeOperation = "multiply";
+    }
+    ctx.drawImage(
+      this.img,
+      -this.width / 2,
+      -this.height / 2,
+      this.width,
+      this.height
+    );
+    ctx.restore();
   }
 }
