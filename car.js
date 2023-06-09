@@ -180,8 +180,9 @@ class Car {
   /**
    * @param {any} ctx A canvas 2d context
    * @param {string | undefined} color The undameged color of the car
+   * @param {boolean | undefined} drawSensor Default `false`
    */
-  draw(ctx, color = "black") {
+  draw(ctx, color = "black", drawSensor = false) {
     ctx.fillStyle = this.damaged ? "gray" : color;
 
     ctx.beginPath();
@@ -196,7 +197,7 @@ class Car {
 
     ctx.fill();
 
-    if (this.sensor) {
+    if (this.sensor && drawSensor) {
       this.sensor.draw(ctx);
     }
   }
